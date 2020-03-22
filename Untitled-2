@@ -1,0 +1,27 @@
+import requests
+from urllib.parse import urljoin
+import pandas as pd
+
+
+START_URL = 'http://books.toscrape.com'
+PAGES_TO_SCRAP = 5
+
+out = []
+url = START_URL
+
+def store_data(out_list, html):
+    for product in html.select('article.product_pod'):
+        title = product.select('h3 > a')[0]['title']
+        price = product.select('div > p.price_color')[0].text[2:]
+        avail = product.select('div > p.instock.availability')[0].text.strip()
+        out.append((title, price, avail))
+
+for _ in range(PAGES_TO_SCRAP):
+    resp = requests.get(url)
+    html = BeautifulSoup(resp.text, 'lxml')
+    store_data(out, html)
+    next_path = html.select('li.next > a')[0]['href']
+    url = urljoin(url, next_path)
+
+pd.DataFrame(out, columns=('title', 'price', 'avail'))
+

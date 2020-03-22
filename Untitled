@@ -1,0 +1,10 @@
+import requests
+
+url = 'http://api.nbp.pl/api/exchangerates/tables/A'
+params = {'format': 'json'}
+resp = requests.get(url)
+resp.status_code
+
+if (resp.status_code == 200 and
+   'application/json' in resp.headers.get('content-type')):
+    d = resp.json()
